@@ -1,6 +1,7 @@
 from functions.json_creatation import create_json_data
 from functions.inv_extraction import extract_inventories_from_excel, extract_annual_data
-import os, openpyxl, glob
+import os, openpyxl, glob, json, tempfile
+import requests as rq
 from pprint import pprint
 
 def main():
@@ -13,7 +14,29 @@ def main():
 
     json_data = extract_annual_data(inventory_sheet, json_data, "sheep")
 
-    pprint(json_data)
+    header = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "terrawise"
+    }
+    url = "https://emissionscalculator-mtls.production.aiaapi.com/calculator/1.3.0/sheep"
+
+    # Key and PEM file paths
+    key = os.path.join("secret", "carbon-calculator-integration.key")
+    pem = os.path.join("secret", "aiaghg-terrawise.pem")
+
+    pprint(json.dumps(json_data))
+
+    # Send the request
+    response = rq.post(url, headers=header, data=json.dumps(json_data), cert=(pem, key))
+
+    if response.status_code > 299:
+        print(f"Error: {response.status_code} - {response.text}")
+        return
+
+    with open(os.path.join("output", "response.json"), "w") as f:
+        f.write(response.json())
+        f.close()
 
 
 if __name__ == "__main__":
