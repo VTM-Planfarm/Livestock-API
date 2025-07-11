@@ -64,15 +64,15 @@ def extract_annual_data(inventory_sheet: openpyxl.Workbook, json_data: dict, liv
     return json_data
 
 
-def extract_lime_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int) -> dict:
-    json_data["limestone"] = annual_sheet.cell(row, 2).value
-    json_data["limestoneFraction"] = annual_sheet.cell(row, 3).value
+def extract_lime_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int, group: int = 0) -> dict:
+    json_data["sheep"][group]["limestone"] = annual_sheet.cell(row, 2).value
+    json_data["sheep"][group]["limestoneFraction"] = annual_sheet.cell(row, 3).value
 
     return json_data
 
 
-def extract_fertiliser_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int) -> dict:
-    json_data["fertiliser"] = {
+def extract_fertiliser_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int, group: int = 0) -> dict:
+    json_data["sheep"][group]["fertiliser"] = {
         "singleSuperphosphate": annual_sheet.cell(row, 4).value,
         "pasutreDryland": annual_sheet.cell(row, 5).value, # Urea
         "pasutreIrrigated": 0, # Urea
@@ -82,7 +82,7 @@ def extract_fertiliser_data(json_data: dict, annual_sheet: openpyxl.worksheet.wo
     }
 
     for col in range(7, 21):
-        json_data["fertiliser"]["otherFertilisers"].append(
+        json_data["sheep"][group]["fertiliser"]["otherFertilisers"].append(
             {
                 "otherType": annual_sheet.cell(1, col).value,
                 "otherDryland": annual_sheet.cell(row, col).value,
@@ -93,12 +93,12 @@ def extract_fertiliser_data(json_data: dict, annual_sheet: openpyxl.worksheet.wo
     return json_data
 
 
-def extract_fuel_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int) -> dict:
-    json_data["diesel"] = annual_sheet.cell(row, 21).value
+def extract_fuel_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int, group: int = 0) -> dict:
+    json_data["sheep"][group]["diesel"] = annual_sheet.cell(row, 21).value
     
-    json_data["petrol"] = annual_sheet.cell(row, 22).value
+    json_data["sheep"][group]["petrol"] = annual_sheet.cell(row, 22).value
     
-    json_data["lgp"] = annual_sheet.cell(row, 23).value
+    json_data["sheep"][group]["lgp"] = annual_sheet.cell(row, 23).value
 
     return json_data
 
@@ -107,20 +107,21 @@ def extract_electricity_data(
         json_data: dict, 
         annual_sheet: openpyxl.worksheet.worksheet.Worksheet,
         inventory_sheet: openpyxl.Workbook, 
-        row: int
+        row: int,
+        group: int = 0
 ) -> dict:
-    json_data["electricitySource"] = inventory_sheet["Client detail"].cell(54, 7).value
+    json_data["sheep"][group]["electricitySource"] = inventory_sheet["Client detail"].cell(54, 7).value
 
-    if json_data["electricitySource"] != "Renewable":
-        json_data["electricityRenewable"] = annual_sheet.cell(row, 30).value
+    if json_data["sheep"][group]["electricitySource"] != "Renewable":
+        json_data["sheep"][group]["electricityRenewable"] = annual_sheet.cell(row, 30).value
 
-    json_data["electricityUse"] = annual_sheet.cell(row, 31).value
+    json_data["sheep"][group]["electricityUse"] = annual_sheet.cell(row, 31).value
 
     return json_data
 
 
-def extract_supplementation_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int) -> dict:
-    json_data["mineralSuplementation"] = {
+def extract_supplementation_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int, group: int = 0) -> dict:
+    json_data["sheep"][group]["mineralSuplementation"] = {
         "mineralBlock": annual_sheet.cell(row, 24).value,
         "mineralBlockUrea": annual_sheet.cell(row, 25).value,
         "weanerBlock": annual_sheet.cell(row, 26).value,
@@ -132,25 +133,25 @@ def extract_supplementation_data(json_data: dict, annual_sheet: openpyxl.workshe
     return json_data
 
 
-def extract_feed_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int) -> dict:
-    json_data["grainFeed"] = annual_sheet.cell(row, 32).value
+def extract_feed_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int, group: int = 0) -> dict:
+    json_data["sheep"][group]["grainFeed"] = annual_sheet.cell(row, 32).value
 
-    json_data["hayFeed"] = annual_sheet.cell(row, 33).value
-
-    return json_data
-
-
-def extract_chemical_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int) -> dict:
-    json_data["herbicide"] = annual_sheet.cell(row, 34).value
-
-    json_data["herbicideOther"] = annual_sheet.cell(row, 35).value
-
-    json_data["merionoPercent"] = annual_sheet.cell(row, 36).value
+    json_data["sheep"][group]["hayFeed"] = annual_sheet.cell(row, 33).value
 
     return json_data
 
-def extract_ewesLambing_rate(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int) -> dict:
-    json_data["ewesLambing"] = {
+
+def extract_chemical_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int, group: int = 0) -> dict:
+    json_data["sheep"][group]["herbicide"] = annual_sheet.cell(row, 34).value
+
+    json_data["sheep"][group]["herbicideOther"] = annual_sheet.cell(row, 35).value
+
+    json_data["sheep"][group]["merionoPercent"] = annual_sheet.cell(row, 36).value
+
+    return json_data
+
+def extract_ewesLambing_rate(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int, group: int = 0) -> dict:
+    json_data["sheep"][group]["ewesLambing"] = {
         "autumn": 0,
         "winter": 0,
         "spring": 0,
@@ -160,12 +161,12 @@ def extract_ewesLambing_rate(json_data: dict, annual_sheet: openpyxl.worksheet.w
     season = annual_sheet.cell(row, 37).value
     rate = annual_sheet.cell(row, 38).value
 
-    json_data["ewesLambing"][season.lower()] = rate # type: ignore
+    json_data["sheep"][group]["ewesLambing"][season.lower()] = rate # type: ignore
 
     return json_data
 
-def extract_seasonalLambing_rate(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int) -> dict:
-    json_data["seasonalLambing"] = {
+def extract_seasonalLambing_rate(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int, group: int = 0) -> dict:
+    json_data["sheep"][group]["seasonalLambing"] = {
         "autumn": 0,
         "winter": 0,
         "spring": 0,
@@ -175,6 +176,6 @@ def extract_seasonalLambing_rate(json_data: dict, annual_sheet: openpyxl.workshe
     season = annual_sheet.cell(row, 39).value
     rate = annual_sheet.cell(row, 40).value
 
-    json_data["seasonalLambing"][season.lower()] = rate # type: ignore
+    json_data["sheep"][group]["seasonalLambing"][season.lower()] = rate # type: ignore
 
     return json_data
