@@ -6,6 +6,8 @@ stock_classes = [
     "tradeWethers",
     "maidenBreedingEwes",
     "tradeBreedingEwes",
+    "breedingEwes",
+    "tradeBreedingEwes",
     "otherEwes",
     "tradeOtherEwes",
     "eweLambs",
@@ -36,6 +38,10 @@ seasonal_stock_class_data = {
 
 # Stock class specific annual data
 annual_stock_class_data = {
+    "autumn": seasonal_stock_class_data.copy(),
+    "winter": seasonal_stock_class_data.copy(),
+    "spring": seasonal_stock_class_data.copy(),
+    "summer": seasonal_stock_class_data.copy(),
     "headShorn": 0,
     "woolShorn": 0,
     "cleanWoolYield": 0,

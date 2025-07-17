@@ -10,7 +10,8 @@ def main():
     inventory_sheet = openpyxl.load_workbook(file_path[0], data_only=True)
 
     seasonal_sheep = extract_inventories_from_excel(inventory_sheet, "sheep")
-    json_data = create_json_data(seasonal_sheep, group=1, northOfTropicOfCapricorn=False, rainfallAbove600mm=False)
+
+    json_data = create_json_data(seasonal_sheep, northOfTropicOfCapricorn=False, rainfallAbove600mm=False)
 
     json_data = extract_annual_data(inventory_sheet, json_data, "sheep")
 
@@ -25,17 +26,15 @@ def main():
     key = os.path.join("secret", "carbon-calculator-integration.key")
     pem = os.path.join("secret", "aiaghg-terrawise.pem")
 
-    pprint(json.dumps(json_data))
-
     # Send the request
     response = rq.post(url, headers=header, data=json.dumps(json_data), cert=(pem, key))
 
     if response.status_code > 299:
-        print(f"Error: {response.status_code} - {response.text}")
+        print(f"Error: {response.status_code}")
         return
 
     with open(os.path.join("output", "response.json"), "w") as f:
-        f.write(response.json())
+        f.write(json.dumps(response.json(), indent=4))
         f.close()
 
 

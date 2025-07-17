@@ -2,7 +2,8 @@ import os, openpyxl
 import openpyxl.worksheet
 import openpyxl.worksheet.worksheet
 import glob
-from functions.vars import seasonal_stock_class_data, annual_stock_class_data
+from functions.vars import seasonal_stock_class_data, annual_stock_class_data, stock_classes
+from copy import deepcopy
 
 def extract_inventories_from_excel(inventory_sheet: openpyxl.Workbook, livestock: str) -> list:
     seasonal_data = []
@@ -21,20 +22,17 @@ def extract_seasonal_data(
 
     for col in range(3, 19):
         stock_class = seasonal_sheet.cell(2, col).value
-        stock_data[stock_class] = annual_stock_class_data
+        stock_data[stock_class] = deepcopy(annual_stock_class_data)
 
-        for row in range(3, 33):
-            if seasonal_sheet.cell(row, 1).value is None:
-                continue
-            
+        for row in range(3, 34):
             key = seasonal_sheet.cell(row, 2).value
             season = seasonal_sheet.cell(row, 1).value
             value = seasonal_sheet.cell(row, col).value
 
             if season is not None:
-                if season.lower() not in stock_data[stock_class]:
-                    stock_data[stock_class][season.lower()] = seasonal_stock_class_data
                 stock_data[stock_class][season.lower()][key] = value
+            elif key == "head" or key == "purchaseWeight":
+                stock_data[stock_class]["purchases"][0][key] = value
             else:
                 stock_data[stock_class][key] = value
 
@@ -58,6 +56,7 @@ def extract_annual_data(inventory_sheet: openpyxl.Workbook, json_data: dict, liv
     json_data = extract_supplementation_data(json_data, annual_sheet, row)
     json_data = extract_feed_data(json_data, annual_sheet, row)
     json_data = extract_chemical_data(json_data, annual_sheet, row)
+    json_data = extract_merino_pct(json_data, annual_sheet, row)
     json_data = extract_ewesLambing_rate(json_data, annual_sheet, row)
     json_data = extract_seasonalLambing_rate(json_data, annual_sheet, row)
 
@@ -121,7 +120,7 @@ def extract_electricity_data(
 
 
 def extract_supplementation_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int, group: int = 0) -> dict:
-    json_data["sheep"][group]["mineralSuplementation"] = {
+    json_data["sheep"][group]["mineralSupplementation"] = {
         "mineralBlock": annual_sheet.cell(row, 24).value,
         "mineralBlockUrea": annual_sheet.cell(row, 25).value,
         "weanerBlock": annual_sheet.cell(row, 26).value,
@@ -147,6 +146,11 @@ def extract_chemical_data(json_data: dict, annual_sheet: openpyxl.worksheet.work
     json_data["sheep"][group]["herbicideOther"] = annual_sheet.cell(row, 35).value
 
     json_data["sheep"][group]["merionoPercent"] = annual_sheet.cell(row, 36).value
+
+    return json_data
+
+def extract_merino_pct(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int, group: int = 0) -> dict:
+    json_data["sheep"][group]["merinoPercent"] = annual_sheet.cell(row, 36).value
 
     return json_data
 
