@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 # Stock class list
 stock_classes = [
     "rams",
@@ -30,18 +32,15 @@ seasons = [
 seasonal_stock_class_data = {
     "head": 0,
     "liveweight": 0.0,
-    "liveweightGain": 0.0,
-    "crudeProtein": 0.0,
-    "dryMatterDigestibility": 0.0,
-    "feedAvailability": 0.0
+    "liveweightGain": 0.0
 }
 
 # Stock class specific annual data
 annual_stock_class_data = {
-    "autumn": seasonal_stock_class_data.copy(),
-    "winter": seasonal_stock_class_data.copy(),
-    "spring": seasonal_stock_class_data.copy(),
-    "summer": seasonal_stock_class_data.copy(),
+    "autumn": deepcopy(seasonal_stock_class_data),
+    "winter": deepcopy(seasonal_stock_class_data),
+    "spring": deepcopy(seasonal_stock_class_data),
+    "summer": deepcopy(seasonal_stock_class_data),
     "headShorn": 0,
     "woolShorn": 0,
     "cleanWoolYield": 0,
