@@ -37,9 +37,13 @@ def seasonal_data(
     json_data["sheep"][index]["classes"][stock_class][season]["head"] = head
     json_data["sheep"][index]["classes"][stock_class][season]["liveweight"] = liveweight
     json_data["sheep"][index]["classes"][stock_class][season]["liveweightGain"] = liveweightGain
-    json_data["sheep"][index]["classes"][stock_class][season]["crudeProtein"] = crudeProtein
-    json_data["sheep"][index]["classes"][stock_class][season]["dryMatterDigestibility"] = dryMatterDigestibility
-    json_data["sheep"][index]["classes"][stock_class][season]["feedAvailability"] = feedAvailability
+
+    if crudeProtein > 0:
+        json_data["sheep"][index]["classes"][stock_class][season]["crudeProtein"] = crudeProtein
+    if dryMatterDigestibility > 0:
+        json_data["sheep"][index]["classes"][stock_class][season]["dryMatterDigestibility"] = dryMatterDigestibility
+    if feedAvailability > 0:
+        json_data["sheep"][index]["classes"][stock_class][season]["feedAvailability"] = feedAvailability
 
     return json_data
 
