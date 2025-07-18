@@ -1,8 +1,7 @@
 import os, openpyxl
 import openpyxl.worksheet
 import openpyxl.worksheet.worksheet
-import glob
-from functions.vars import seasonal_stock_class_data, annual_stock_class_data, stock_classes
+from functions.vars import annual_stock_class_data
 from copy import deepcopy
 
 def extract_inventories_from_excel(inventory_sheet: openpyxl.Workbook, livestock: str) -> list:
@@ -28,6 +27,10 @@ def extract_seasonal_data(
             key = seasonal_sheet.cell(row, 2).value
             season = seasonal_sheet.cell(row, 1).value
             value = seasonal_sheet.cell(row, col).value
+
+            if key in ["crudeProtein", "dryMatterDigestibility", "feedAvailability"]:
+                if value == 0:
+                    continue
 
             if season is not None:
                 stock_data[stock_class][season.lower()][key] = value
