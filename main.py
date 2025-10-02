@@ -20,7 +20,7 @@ def main():
         "Content-Type": "application/json",
         "User-Agent": "terrawise"
     }
-    url = "https://emissionscalculator-mtls.production.aiaapi.com/calculator/1.3.0/sheep"
+    url = "https://emissionscalculator-mtls.production.aiaapi.com/calculator/2.0.0/sheep"
 
     # Key and PEM file paths
     key = os.path.join("secret", "carbon-calculator-integration.key")
@@ -31,12 +31,16 @@ def main():
 
     if response.status_code > 299:
         print(f"Error: {response.status_code}")
+        print(response.text)
         return
 
     with open(os.path.join("output", "response.json"), "w") as f:
         f.write(json.dumps(response.json(), indent=4))
         f.close()
 
+    with open(os.path.join("input", "input.json"), "w") as f:
+        f.write(json.dumps(json_data, indent=4))
+        f.close()
 
 if __name__ == "__main__":
     main()
