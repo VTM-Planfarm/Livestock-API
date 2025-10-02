@@ -62,6 +62,7 @@ def extract_annual_data(inventory_sheet: openpyxl.Workbook, json_data: dict, liv
     json_data = extract_merino_pct(json_data, annual_sheet, row)
     json_data = extract_ewesLambing_rate(json_data, annual_sheet, row)
     json_data = extract_seasonalLambing_rate(json_data, annual_sheet, row)
+    json_data = extract_vegetation_data(json_data, inventory_sheet["Vegetation"])
 
     return json_data
 
@@ -76,8 +77,8 @@ def extract_lime_data(json_data: dict, annual_sheet: openpyxl.worksheet.workshee
 def extract_fertiliser_data(json_data: dict, annual_sheet: openpyxl.worksheet.worksheet.Worksheet, row: int, group: int = 0) -> dict:
     json_data["sheep"][group]["fertiliser"] = {
         "singleSuperphosphate": annual_sheet.cell(row, 4).value,
-        "pasutreDryland": annual_sheet.cell(row, 5).value, # Urea
-        "pasutreIrrigated": 0, # Urea
+        "pastureDryland": annual_sheet.cell(row, 5).value, # Urea
+        "pastureIrrigated": 0, # Urea
         "cropsDryland": annual_sheet.cell(row, 6).value, # Urea
         "cropsIrrigated": 0, # Urea
         "otherFertilisers": []
@@ -100,7 +101,7 @@ def extract_fuel_data(json_data: dict, annual_sheet: openpyxl.worksheet.workshee
     
     json_data["sheep"][group]["petrol"] = annual_sheet.cell(row, 22).value
     
-    json_data["sheep"][group]["lgp"] = annual_sheet.cell(row, 23).value
+    json_data["sheep"][group]["lpg"] = annual_sheet.cell(row, 23).value
 
     return json_data
 
@@ -184,5 +185,41 @@ def extract_seasonalLambing_rate(json_data: dict, annual_sheet: openpyxl.workshe
     rate = annual_sheet.cell(row, 40).value
 
     json_data["sheep"][group]["seasonalLambing"][season.lower()] = rate # type: ignore
+
+    return json_data
+
+def extract_vegetation_data(json_data: dict, vegetation_sheet: openpyxl.worksheet.worksheet.Worksheet) -> dict:
+    json_data["vegetation"] = []
+
+    row = 2
+    if vegetation_sheet.cell(row, 6).value is None:
+        json_data["vegetation"].append(
+            {
+                "vegetation": {
+                    "region": "South West",
+                    "treeSpecies": "No tree data available",
+                    "soil": "No Soil / Tree data available",
+                    "area": 0,
+                    "age": 0
+                },
+                "sheepProportion": [1]
+            }
+        )
+        return json_data
+    
+    while vegetation_sheet.cell(row, 6).value is not None:
+        json_data["vegetation"].append(
+            {
+                "vegetation": {
+                    "region": vegetation_sheet.cell(row, 2).value,
+                    "treeSpecies": vegetation_sheet.cell(row, 3).value,
+                    "soil": vegetation_sheet.cell(row, 5).value,
+                    "area": vegetation_sheet.cell(row, 7).value,
+                    "age": vegetation_sheet.cell(row, 8).value
+                },
+                "sheepProportion": [1]
+            }
+        )
+        row += 1
 
     return json_data
